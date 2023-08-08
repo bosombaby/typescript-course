@@ -1,101 +1,109 @@
 <template>
   <div class="todo">
-    <input type="text" placeholder="请输入待办事项" v-model.trim="todoInput" class="todo-input" /> &nbsp;
-    <button @click="addList">添加</button> &nbsp;
-    <button @click="removeCheck">清理</button>
-    <div v-if="todoList.length">
+    <div class="todo-input">
+      <input type="text" v-model.trim="inputText">
+      <button @click="addItem">添加</button>
+      <button @click="removeDone">清理</button>
+    </div>
+    <div class="todo-list">
       <ul v-for="(item, index) in todoList" :key="index">
-        <li class="todo-item">
-          <input type="checkbox" v-model="item.done" />
+        <li>
+          <input type="checkbox" v-model="item.done">
           <span :class="{ done: item.done }">{{ item.msg }}</span>
-          <button @click="removeList(index)">❎</button>
+          <button @click="removeItem(index)">❎</button>
         </li>
       </ul>
     </div>
-
-    <div class="choice-select">
-      <span>全选：</span>
-      <input type="checkbox" v-model="isAllDone">
-      <span>{{ hasDone }} / {{ todoList.length }}</span>
+    <div class="todo-num">
+      <span>全选</span>
+      <input type="checkbox" v-model="hasAllDone">
+      <span>{{ hasDone }}/{{ todoList.length }}</span>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-
-interface TodoItem {
+interface Todo {
   msg: string,
   done: boolean
 }
 
-const todoInput = ref<string>('')
+const inputText = ref<string>('')
 
-const todoList = ref<TodoItem[]>([
+
+const todoList = ref<Todo[]>([
   { msg: '吃饭', done: false },
   { msg: '睡觉', done: false },
-  { msg: '打豆豆', done: false },
+  { msg: '打豆豆', done: false }
 ])
 
-const hasDone = computed(() => todoList.value.filter(item => item.done).length)
+//当前选择的个数
+const hasDone = computed<number>(() => {
+  return todoList.value.filter(item => item.done).length
+})
 
-
-
-const isAllDone = computed<boolean>({
+//是否全选
+const hasAllDone = computed<boolean>({
   get() {
     return hasDone.value === todoList.value.length
   },
-  set(val) {
-    todoList.value.forEach(item => item.done = val)
+  set() {
+    todoList.value.forEach(item => item.done = !item.done)
   }
 })
 
 
-//添加元素
-let addList = () => {
-  if (todoInput.value) {
-    todoList.value.push({ msg: todoInput.value, done: false })
-    todoInput.value = ''
+
+//添加
+let addItem = () => {
+  if (inputText.value) {
+    todoList.value.push({
+      msg: inputText.value,
+      done: false
+    })
+    inputText.value = ''
   }
 }
 
-//删除元素
-let removeList = (index: number) => {
+//删除
+let removeItem = (index: number) => {
   todoList.value.splice(index, 1)
 }
 
-//删除所有已经完成的
-let removeCheck = () => {
+//删除已经完成的
+let removeDone = () => {
   todoList.value = todoList.value.filter(item => !item.done)
 }
-
 
 </script>
 
 <style scoped>
 .todo {
-  width: 500px;
+  width: 280px;
   margin: 0 auto;
-  padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .todo-input {
-  margin: 20px 0;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 14px;
 }
 
-.todo-item {
+.todo-num {
   display: flex;
-  gap: 20px;
+  gap: 14px;
 }
 
-.choice-select {
+.todo-list ul li {
   display: flex;
-  margin-top: 24px;
-  gap: 20px;
+  gap: 24px;
 }
 
 .done {
