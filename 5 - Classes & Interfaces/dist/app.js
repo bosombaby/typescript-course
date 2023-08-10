@@ -1,2 +1,8 @@
 "use strict";
-console.log('Hello TypeScript11');
+class Person {
+    constructor() {
+        this.name = 'Max';
+        console.log('Creating person object...');
+    }
+}
+const person = new Person();
