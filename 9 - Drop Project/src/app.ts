@@ -13,6 +13,7 @@ class ProjectInput {
         this.hostElement = document.querySelector('#app')! as HTMLDivElement;
 
         const importedNode = document.importNode(this.templateElement.content, true);
+
         this.element = importedNode.firstElementChild as HTMLFormElement;
         this.element.id = 'user-input';
 
