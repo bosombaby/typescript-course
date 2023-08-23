@@ -1,4 +1,42 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+function validate(validatableInput) {
+    let flag = true;
+    if (validatableInput.required) {
+        flag = flag && validatableInput.value.toString().trim().length !== 0;
+    }
+    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+        flag = flag && validatableInput.value.length >= validatableInput.minLength;
+    }
+    if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+        flag = flag && validatableInput.value.length <= validatableInput.maxLength;
+    }
+    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+        flag = flag && validatableInput.value >= validatableInput.min;
+    }
+    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+        flag = flag && validatableInput.value <= validatableInput.max;
+    }
+    return flag;
+}
+// 方法装饰器
+function autobind(target, name, descriptor) {
+    // 重写该方法的属性描述符
+    const originalMethod = descriptor.value;
+    const newDescriptor = {
+        configurable: true,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        }
+    };
+    return newDescriptor;
+}
 class ProjectInput {
     constructor() {
         this.templateElement = document.querySelector('#project-input');
@@ -13,16 +51,57 @@ class ProjectInput {
         this.configure();
         this.attach();
     }
+    getUserInput() {
+        const title = this.titleInputElement.value;
+        const description = this.descriptionInputElement.value;
+        const people = this.peopleInputElement.value;
+        const titleValidatable = {
+            value: title,
+            required: true,
+            maxLength: 20
+        };
+        const descriptionValidatable = {
+            value: description,
+            required: true,
+            minLength: 5
+        };
+        const peopleValidatable = {
+            value: +people,
+            required: true,
+            min: 1,
+            max: 5
+        };
+        if (!validate(titleValidatable) || !validate(descriptionValidatable) || !validate(peopleValidatable)) {
+            alert('Invalid input, please try again!');
+            return;
+        }
+        else {
+            return [title, description, +people];
+        }
+    }
+    clearUserInput() {
+        this.titleInputElement.value = '';
+        this.descriptionInputElement.value = '';
+        this.peopleInputElement.value = '';
+    }
     sumbitHandler(event) {
         event.preventDefault();
-        console.log(this.titleInputElement.value);
+        const userInput = this.getUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, description, people] = userInput;
+            console.log(title, description, people);
+            this.clearUserInput();
+        }
     }
     configure() {
-        this.sumbitElement.addEventListener('click', this.sumbitHandler.bind(this));
+        this.sumbitElement.addEventListener('click', this.sumbitHandler);
     }
     attach() {
         this.hostElement.insertAdjacentElement('afterbegin', this.element);
     }
 }
+__decorate([
+    autobind
+], ProjectInput.prototype, "sumbitHandler", null);
 const prjInput = new ProjectInput();
 //# sourceMappingURL=app.js.map
