@@ -30,8 +30,6 @@ function validate(validatableInput: Validatable): boolean {
 
 
 
-
-
 // 方法装饰器
 function autobind(target: any, name: string, descriptor: PropertyDescriptor) {
     // 重写该方法的属性描述符
@@ -47,6 +45,7 @@ function autobind(target: any, name: string, descriptor: PropertyDescriptor) {
     return newDescriptor
 }
 
+// 输入模块
 class ProjectInput {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
@@ -136,4 +135,44 @@ class ProjectInput {
     }
 }
 const prjInput = new ProjectInput();
+
+
+// 接口定义
+
+
+//完成模块
+class ProjectList {
+
+    templateElement: HTMLTemplateElement;
+    hostElement: HTMLDivElement;
+    element: HTMLFormElement;
+    // 显示类型，是已完成还是未完成
+    constructor(private type: 'active' | 'finished') {
+
+        this.templateElement = document.querySelector('#project-list')! as HTMLTemplateElement;
+        this.hostElement = document.querySelector('#app')! as HTMLDivElement;
+
+        const importedNode = document.importNode(this.templateElement.content, true);
+
+        this.element = importedNode.firstElementChild as HTMLFormElement;
+        this.element.id = `${this.type}-projects`;
+
+        this.renderContent()
+        this.attach();
+    }
+
+    // 样式渲染
+    private renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.innerHTML = this.type.toUpperCase();
+    }
+
+    private attach() {
+        this.hostElement.insertAdjacentElement('beforeend', this.element);
+    }
+}
+
+const project1 = new ProjectList('active');
+const project2 = new ProjectList('finished');
 

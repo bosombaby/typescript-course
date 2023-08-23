@@ -37,6 +37,7 @@ function autobind(target, name, descriptor) {
     };
     return newDescriptor;
 }
+// 输入模块
 class ProjectInput {
     constructor() {
         this.templateElement = document.querySelector('#project-input');
@@ -104,4 +105,30 @@ __decorate([
     autobind
 ], ProjectInput.prototype, "sumbitHandler", null);
 const prjInput = new ProjectInput();
+// 接口定义
+//完成模块
+class ProjectList {
+    // 显示类型，是已完成还是未完成
+    constructor(type) {
+        this.type = type;
+        this.templateElement = document.querySelector('#project-list');
+        this.hostElement = document.querySelector('#app');
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild;
+        this.element.id = `${this.type}-projects`;
+        this.renderContent();
+        this.attach();
+    }
+    // 样式渲染
+    renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector('ul').id = listId;
+        this.element.querySelector('h2').innerHTML = this.type.toUpperCase();
+    }
+    attach() {
+        this.hostElement.insertAdjacentElement('beforeend', this.element);
+    }
+}
+const project1 = new ProjectList('active');
+const project2 = new ProjectList('finished');
 //# sourceMappingURL=app.js.map
